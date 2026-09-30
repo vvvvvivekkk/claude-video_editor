@@ -1,0 +1,15 @@
+# deps
+node_modules/
+
+# secrets
+.env
+
+# your videos
+input/*
+!input/.gitkeep
+
+# generated
+data/*
+!data/.gitkeep
+output/*
+!output/.gitkeep
