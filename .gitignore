@@ -13,3 +13,12 @@ data/*
 !data/.gitkeep
 output/*
 !output/.gitkeep
+
+# motion stage — per-video projects are scratch; the shared assets (fonts,
+# sfx, styles, base prompt, moves) ARE committed so Claude always has them.
+motion/projects/*
+!motion/projects/.gitkeep
+motion/fonts/*
+!motion/fonts/README.md
+motion/sfx/*
+!motion/sfx/README.md

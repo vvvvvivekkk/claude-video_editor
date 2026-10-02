@@ -74,13 +74,17 @@ const assPath = path.join('data', 'captions.ass');
 fs.writeFileSync(assPath, ass);
 console.log(`Wrote ${chunks.length} caption chunks -> ${assPath}`);
 
-// Burn into video.
-const master = path.join('output', 'edited-master.mp4');
+// Burn into video. Prefer with-graphics.mp4 (motion stage output) over the
+// bare cut master, so motion graphics stay under the captions.
+const withGraphics = path.join('output', 'with-graphics.mp4');
+const bareMaster = path.join('output', 'edited-master.mp4');
+const master = fs.existsSync(withGraphics) ? withGraphics : bareMaster;
 const finalOut = path.join('output', 'final.mp4');
 if (!fs.existsSync(master)) {
-  console.error(`Missing ${master}. Run: node scripts/cut.js <input> first.`);
+  console.error(`Missing ${bareMaster}. Run: node scripts/cut.js <input> first.`);
   process.exit(1);
 }
+console.log(`Base video: ${master}`);
 
 console.log(`Burning captions -> ${finalOut}`);
 // ffmpeg subtitles filter needs forward slashes and escaped colon on Windows.
