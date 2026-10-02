@@ -1,10 +1,12 @@
 {
   "name": "claude-video-editor",
-  "version": "0.2.0",
-  "description": "Claude-driven video editing pipeline: transcribe -> cuts.json -> render -> motion graphics -> captions",
+  "version": "0.3.0",
+  "description": "Claude-driven video editing pipeline: reference, watch, transcribe -> cuts.json -> render -> motion graphics -> captions",
   "type": "module",
   "scripts": {
+    "reference": "node scripts/reference.js",
     "transcribe": "node scripts/transcribe.js",
+    "watch": "node scripts/watch.js",
     "cut": "node scripts/cut.js",
     "motion:setup": "node scripts/motion-setup.js",
     "motion": "node scripts/motion.js",

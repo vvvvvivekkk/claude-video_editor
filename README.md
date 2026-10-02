@@ -2,8 +2,10 @@
 
 Raw video in → Claude authors the cuts → ffmpeg renders → Claude authors motion graphics (HyperFrames) → ffmpeg composites → captions burn in. English talking-head, IG Reels / YouTube.
 
-Three stages:
+Three stages, with two optional pre-cut inputs that make the cuts smarter:
 
+0. **Reference** *(optional)* — download a reel you want to edit *like*, so Claude has structure to pattern-match against
+0. **Watch** *(optional)* — sample frames from your raw so Claude can SEE what's on screen, not just read the transcript
 1. **Cut** — transcribe + Claude writes `cuts.json` + ffmpeg renders `edited-master.mp4`
 2. **Motion** *(optional)* — HyperFrames overlay authored in Claude Code, composited onto the master
 3. **Caption** — TikTok-style burned-in captions on whatever's at `output/with-graphics.mp4` or `output/edited-master.mp4`
@@ -77,9 +79,39 @@ Checks Node 22+, ffmpeg, whisper-cpp, then installs the HyperFrames Claude Code 
 
 Then grab the fonts (Inter, Archivo Black, Instrument Serif, Bricolage Grotesque — all free) and drop the `.woff2` files into `motion/fonts/`. See `motion/fonts/README.md`.
 
+### 7. (Optional) Install yt-dlp for the reference stage
+
+Only needed if you want to download reels to edit *like*:
+
+```bash
+# macOS
+brew install yt-dlp
+
+# Windows
+winget install yt-dlp
+
+# Linux
+pip install -U yt-dlp
+```
+
 ---
 
 ## Editing a video — the fast path
+
+### Stage 0 (optional): grab a reference and sample frames
+
+```bash
+# Grab a reel to edit like
+npm run reference -- https://www.instagram.com/reel/XXXX/
+# → reference/<auto-name>/{video.mp4, transcript.json, info.json}
+
+# After you drop your raw in input/, let Claude see it too
+npm run watch -- input/reel1.mp4
+# → data/reel1-frames/*.jpg + data/reel1.watch.json  (one frame every 2s)
+
+# Or one frame per spoken word, for tight work:
+npm run watch -- input/reel1.mp4 --at-words
+```
 
 ### Stage 1: cut
 
@@ -93,6 +125,11 @@ npm run transcribe -- input/reel1.mp4
 # 3. In Claude Code, say:
 #    "Read data/reel1.transcript.json and write cuts.json. 60-second
 #     IG Reel — hook in the first 3 seconds, tight pacing, no filler."
+#
+#    If you ran `watch` and/or `reference`, say that too:
+#    "Use data/reel1.watch.json for the frames. Edit it like
+#     reference/damianodesu-this-is-how-i-edit/."
+#
 #    Claude writes data/cuts.json and reports what it cut.
 
 # 4. Render the cut
@@ -148,9 +185,10 @@ Say the moment in **words**, not seconds — *"when I say forty a week"* works b
 
 ```
 input/              raw .mp4 files (git-ignored)
-data/               transcripts, cuts.json, captions.ass (intermediates)
+reference/          downloaded reels you want to edit *like* (git-ignored)
+data/               transcripts, cuts.json, captions.ass, frame samples (intermediates)
 output/             edited-master.mp4, with-graphics.mp4, final.mp4
-scripts/            the pipeline (transcribe, cut, motion-setup, motion, compose, caption)
+scripts/            the pipeline (reference, transcribe, watch, cut, motion-setup, motion, compose, caption)
 motion/
   BASE_PROMPT.md    the overlay-on-video prompt
   MOVES.md          the 10 named motion moves
@@ -203,8 +241,8 @@ Name any of them and Claude knows what to do. Mix moves within a video — don't
 
 ## What Claude Code does vs what you do
 
-- **Claude authors `cuts.json`** (editorial) and **the motion overlay HTML** (visual) — the hard parts.
-- **You run** `npm run cut`, `npm run compose`, `npm run caption` — deterministic renders.
+- **Claude authors `cuts.json`** (editorial, from transcript + optional frames + optional reference) and **the motion overlay HTML** (visual) — the hard parts.
+- **You run** `npm run reference`, `npm run watch`, `npm run cut`, `npm run compose`, `npm run caption` — deterministic.
 - **You give Claude feedback** — "cut clip 6, false start" / "pop the stat on *forty*, not *week*" — and Claude rewrites the file.
 
 Nothing here uses Claude to render pixels. The judgment is Claude's; the rendering is ffmpeg's and HyperFrames'. That's what makes it reliable.

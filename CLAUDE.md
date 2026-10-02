@@ -5,9 +5,16 @@ This repo is a video editor. You (Claude) are the editor. The user records a raw
 ## The pipeline
 
 ```
+(optional, before you shoot)
+   -> npm run reference -- <url>           (downloads + transcribes an example)
+   -> reference/<name>/{video.mp4, transcript.json, info.json}
+
 input/raw.mp4
    -> npm run transcribe -- input/raw.mp4
    -> data/raw.transcript.json             (word-level, from Groq Whisper)
+
+   -> npm run watch -- input/raw.mp4       (OPTIONAL — samples frames so you can see)
+   -> data/raw-frames/*.jpg + data/raw.watch.json
 
    -> YOU WRITE: data/cuts.json            (list of good clips)
    -> npm run cut -- input/raw.mp4
@@ -23,13 +30,31 @@ input/raw.mp4
    -> output/final.mp4                     (motion + burned-in captions)
 ```
 
-Stages 2 (cuts) and 4 (motion) are **yours** — editorial judgment. Stages 1, 3, 5, 6 (transcribe, cut, compose, caption) are deterministic — the user runs them.
+Stages 2 (cuts) and 4 (motion) are **yours** — editorial judgment. Stages 1, 3, 5, 6 (transcribe, cut, compose, caption) are deterministic — the user runs them. The reference and watch stages are optional context — reach for them when they help.
 
 The motion stage is **optional**. If the user doesn't want graphics, skip it; `caption.js` auto-detects whether `with-graphics.mp4` exists and burns onto whichever is newer.
 
 ---
 
 ## Stage A — Write `data/cuts.json`
+
+Before you start, check what's actually available to you — these are two optional inputs that make the cuts a lot better:
+
+### Pre-cut inputs (use when they're there)
+
+**`reference/<name>/transcript.json`** — if the user asks you to edit "like" an example reel ("make it feel like Damiano's last reel", "match that TikTok pacing"), look for the reference. The folder is created by `npm run reference -- <url>`. Open its transcript, work out the structural pattern (hook shape, average sentence length, pause pattern, where numbers land), and apply that pattern to the raw transcript — don't copy words. Mention in your report-back which reference you used and what pattern you lifted.
+
+**`data/<name>-frames/*.jpg` + `data/<name>.watch.json`** — if the user ran `npm run watch -- input/<name>.mp4`, the editor can SEE the raw footage, not just read the transcript. Open `data/<name>.watch.json` for the frame index (timestamp → file path), then Read a handful of frames at your candidate cut boundaries BEFORE finalizing `cuts.json`. What to look for:
+- Mid-blink or mid-gesture freeze at a planned cut point — nudge the cut by 100–200ms
+- Dead eyes / staring off camera at the start of a would-keep clip — probably a false start, cut earlier
+- B-roll opportunities (speaker gesturing at something off-screen, holding an object, turning to a second screen) — note these in the clip `reason` field as `"b-roll: show the X here"` so the motion stage picks them up
+- Visual repeats you'd otherwise miss (speaker says the same thing twice but with the same gesture → it's a retake, not a callback)
+
+You don't need to open every frame. Skim the index, pick 5–10 near the hard decisions, open those. Each frame is scaled to 960px long edge, so they're small.
+
+If neither pre-cut input is there, work from the transcript alone as before — just note in your report-back if a decision would have been easier with frames.
+
+### The cuts.json shape
 
 When the user says "make cuts" or "author cuts.json", read the newest `data/*.transcript.json`, decide what's in and what's out, and write `data/cuts.json` in this shape:
 
@@ -70,6 +95,7 @@ When you're done writing `cuts.json`, tell the user in one line:
 - How many clips
 - Total kept duration vs original duration
 - The 2–3 biggest cuts and why (so they can override if you were wrong)
+- Whether you used a reference (name it) and/or frames (say roughly how many you opened)
 
 Then wait — don't run `npm run cut` yourself unless they say so.
 

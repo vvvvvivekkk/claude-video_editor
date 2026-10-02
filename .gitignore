@@ -22,3 +22,9 @@ motion/fonts/*
 !motion/fonts/README.md
 motion/sfx/*
 !motion/sfx/README.md
+
+# downloaded reference videos — big, not meant to be committed. Only the
+# folder marker ships.
+reference/*
+!reference/.gitkeep
+!reference/README.md
