@@ -8,6 +8,8 @@
     "transcribe": "node scripts/transcribe.js",
     "watch": "node scripts/watch.js",
     "cut": "node scripts/cut.js",
+    "realign": "node scripts/realign.js",
+    "beats": "node scripts/beats.js",
     "motion:setup": "node scripts/motion-setup.js",
     "motion": "node scripts/motion.js",
     "compose": "node scripts/compose.js",
