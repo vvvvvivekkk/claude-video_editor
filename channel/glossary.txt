@@ -1,0 +1,16 @@
+# Words the transcriber should spell exactly (one per line, # = comment).
+# These are sent to Whisper as a spelling hint and given to every agent.
+Claude
+Claude Code
+Anthropic
+Remotion
+HyperFrames
+DaVinci Resolve
+FFmpeg
+ElevenLabs
+Groq
+igniteXT
+WikiByVivek
+Varavox
+Hyderabad
+Telugu

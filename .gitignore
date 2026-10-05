@@ -36,3 +36,8 @@ assets/music/*
 !assets/music/README.md
 assets/sfx/*
 !assets/sfx/README.md
+
+# per-video briefs are personal — only the template ships
+briefs/*
+!briefs/_TEMPLATE.md
+!briefs/README.md

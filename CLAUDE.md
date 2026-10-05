@@ -25,6 +25,8 @@ Claude **decides**, scripts **render**. Every creative call is a plan file a sub
 
 `/edit input/<file>.mp4` runs all of it. Audio cleanup (denoise/loudnorm) is intentionally not built yet.
 
+**Context the transcript can't carry.** Before any decision, read `channel/CHANNEL.md` (standing style/audience/CTA), `channel/glossary.txt` (spellings, also sent to Whisper), and `briefs/<name>.md` (this video: point, hook, must-keep lines, "when I say X show Y" visuals, CTA, vibe, avoid-list, optional script). The brief beats the channel file; both beat defaults. Missing brief → `/brief input/<file>`. Mis-heard words go in `data/<name>.corrections.json`, applied at realign.
+
 **Master chain.** `cut` resets `data/master.json`; each later stage reads `getMaster('<stage>')` and advances it. Re-running a stage rewinds to the video just before it (no double zooms / double captions) and drops later stages, which then need re-running. Canonical order: cut → color → punch → broll → compose → transitions → sfx → music → caption.
 
 **Time bases.** `cuts.json` and `story.json` use SOURCE time (the raw recording). Everything after the cut — punches, broll, transitions, sfx, captions — uses MASTER time (`data/<n>.cut-transcript.json`). Master time of a join = sum of the clip durations before it.

@@ -50,12 +50,23 @@ if (ff.status !== 0) {
 // 2. Send to Groq Whisper with word timestamps.
 console.log('Sending to Groq Whisper...');
 const groq = new Groq({ apiKey: process.env.GROQ_API_KEY });
+// Spelling hint: channel/glossary.txt (+ section 8 of the brief, if any).
+// Whisper uses the prompt to bias spellings ("Claude" not "cloud").
+const hintWords = [];
+const glossary = path.join('channel', 'glossary.txt');
+if (fs.existsSync(glossary)) {
+  hintWords.push(...fs.readFileSync(glossary, 'utf8').split(/\r?\n/).map((l) => l.trim()).filter((l) => l && !l.startsWith('#')));
+}
+const prompt = hintWords.length ? `Vocabulary: ${hintWords.join(', ')}.`.slice(0, 800) : undefined;
+if (prompt) console.log(`Spelling hints: ${hintWords.length} terms from ${glossary}`);
+
 const result = await groq.audio.transcriptions.create({
   file: fs.createReadStream(audioPath),
   model: 'whisper-large-v3',
   response_format: 'verbose_json',
   timestamp_granularities: ['word', 'segment'],
   language: 'en',
+  ...(prompt ? { prompt } : {}),
 });
 
 // 3. Save the word-level transcript.
@@ -63,4 +74,8 @@ fs.writeFileSync(transcriptPath, JSON.stringify(result, null, 2));
 console.log(`\nSaved: ${transcriptPath}`);
 console.log(`Words: ${result.words?.length ?? 0}`);
 console.log(`Duration: ${result.duration}s`);
-console.log(`\nNext: open ${transcriptPath} in Claude Code and say "make cuts.json"`);
+const briefPath = path.join('briefs', `${base}.md`);
+console.log(fs.existsSync(briefPath)
+  ? `\nBrief found: ${briefPath}`
+  : `\nNo brief yet. In Claude Code run: /brief ${inputVideo}  (tells the editor what the transcript can't)`);
+console.log(`Next: /edit ${inputVideo}  or  /cuts`);

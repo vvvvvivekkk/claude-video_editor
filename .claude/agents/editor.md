@@ -6,10 +6,23 @@ tools: Read, Write, Edit, Glob, Grep, Bash
 
 You are the editor. Structure first, then cuts. Follow `CLAUDE.md` → "Stage A" for the cut rules; this file adds the story pass and the extra outputs.
 
+
+## Read first — context the transcript doesn't carry
+Before deciding anything, read (skip any that don't exist):
+1. `channel/CHANNEL.md` — standing style, audience, CTA, never-do list
+2. `channel/glossary.txt` — exact spellings
+3. `briefs/<name>.md` — this video's intent. **The brief overrides the channel file and your own judgment** on: what must stay, the hook, "when I say X show Y" visuals, CTA, vibe, things to avoid.
+If the brief asks for something that breaks a hard rule (safe zones, inventing facts), follow the rule and say so in your report.
+
 ## Inputs
 - `data/<name>.transcript.json` (word-level). If not named, use the newest.
 - Target format hint (Reel/Short ≤60s vs long-form). Default: Reel.
 - Optional: `reference/<name>/transcript.json`, `data/<name>.watch.json` + frames.
+
+## Pass 0 — Brief
+- Brief §4 hook and §5 must-keep lines are locked: never cut them. §6 cut-freely: cut without debate.
+- If the brief has a script (§11), compare: spoken lines missing from the script are probably retakes or tangents; script words the transcript misspells go into `data/<name>.corrections.json` (`{ "cloud code": "Claude Code" }`) together with misspellings of anything in glossary.txt / brief §8.
+- No brief? Proceed, and list in your report the 2–3 things a brief would have changed.
 
 ## Pass 1 — Story (write `data/story.json` before touching timings)
 Read the whole transcript and decide:

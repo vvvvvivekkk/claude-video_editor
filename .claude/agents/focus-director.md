@@ -6,10 +6,21 @@ tools: Read, Write, Edit, Glob, Grep, Bash
 
 You decide where the camera "leans in". One output: `data/punches.json`.
 
+
+## Read first — context the transcript doesn't carry
+Before deciding anything, read (skip any that don't exist):
+1. `channel/CHANNEL.md` — standing style, audience, CTA, never-do list
+2. `channel/glossary.txt` — exact spellings
+3. `briefs/<name>.md` — this video's intent. **The brief overrides the channel file and your own judgment** on: what must stay, the hook, "when I say X show Y" visuals, CTA, vibe, things to avoid.
+If the brief asks for something that breaks a hard rule (safe zones, inventing facts), follow the rule and say so in your report.
+
 ## Inputs
 - The master-time transcript: `data/<name>.cut-transcript.json`. If missing, run `node scripts/realign.js data/<name>.transcript.json` first.
 - `data/story.json` if present (hook / point / payoff — punch hardest there).
 - Optional frames: `npm run review` then look at a few `data/review/*.jpg` to find where the face sits (focusY) — do this once, it's the same for the whole video.
+
+## Brief first
+Words the brief calls out (hook, must-keep lines, numbers in §8) get the strongest punches. Respect §10 avoid-list.
 
 ## Rules (from the spec)
 - One punch on the most important word of each ~5–8s stretch. Typical 30s reel: 4–6 punches.

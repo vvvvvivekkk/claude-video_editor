@@ -6,10 +6,21 @@ tools: Read, Write, Edit, Glob, Grep, Bash
 
 You make the video "show, don't tell". One output: `data/broll.json`.
 
+
+## Read first — context the transcript doesn't carry
+Before deciding anything, read (skip any that don't exist):
+1. `channel/CHANNEL.md` — standing style, audience, CTA, never-do list
+2. `channel/glossary.txt` — exact spellings
+3. `briefs/<name>.md` — this video's intent. **The brief overrides the channel file and your own judgment** on: what must stay, the hook, "when I say X show Y" visuals, CTA, vibe, things to avoid.
+If the brief asks for something that breaks a hard rule (safe zones, inventing facts), follow the rule and say so in your report.
+
 ## Inputs
 - `data/<name>.cut-transcript.json` (master time). Create with `node scripts/realign.js ...` if missing.
 - The library: every file in `assets/broll/` (videos .mp4/.mov, images .png/.jpg/.webp). Filenames ARE the description (e.g. `venkatesh-lakshmi-mistake.mp4`, `yc-logo.png`, `vscode-terminal-ffmpeg.mp4`). Also read `assets/broll/library.json` if it exists: `{ "<file>": { "tags": [...], "best_moment": 1.5, "notes": "..." } }`.
 - `data/story.json` and `data/punches.json` if present.
+
+## Brief first
+Every "when I say X, show Y" line in brief §7 is a placement you MUST make (find the word in the master-time transcript; tolerate small wording differences). Only after those, add your own matches. If a requested file doesn't exist in assets/broll/, put it at the top of the wishlist.
 
 ## Rules
 - Insert when the speaker NAMES a concrete thing (a tool, screen, logo, product, person, number) or makes a joke a meme can land.

@@ -5,6 +5,8 @@ argument-hint: input/<file>.mp4 [reel|short|youtube]
 
 Edit `$ARGUMENTS` end to end. You are the producer: run deterministic scripts yourself, delegate every creative decision to the right subagent (Agent tool, `subagent_type: <name>`). Keep a task list so the user can see progress. Between stages give a one-line status, not a recap.
 
+**Step 0 — context.** Read `channel/CHANNEL.md`, `channel/glossary.txt` and `briefs/<name>.md`. If there is no brief, run the `/brief` flow first (transcribe, pre-fill, ask ≤4 questions) — it's the single biggest quality lever. Pass the brief path to every subagent. The brief's §9 Vibe answers the questions below; only ask what it leaves open.
+
 Ask the user ONCE at the start (AskUserQuestion if available, else plain text), then don't stop again unless something fails:
 - Format: Reel/Short (default) or long-form YouTube
 - Motion graphics (pop-ups/counters/cards via HyperFrames)? default: no on the first pass — it's the slowest stage
@@ -16,7 +18,7 @@ Ask the user ONCE at the start (AskUserQuestion if available, else plain text), 
 1. **Transcribe** — `npm run transcribe -- <input>` → `data/<name>.transcript.json`
 2. **Story + cuts** — subagent `editor` → `data/story.json`, `data/cuts.json`, `data/transitions.json`. Relay its report (hook, durations, flags).
 3. **Cut** — `npm run cut -- <input>` (uses `lcut` from cuts.json) → `output/edited-master.mp4`
-4. **Realign** — `npm run realign -- data/<name>.transcript.json` → `data/<name>.cut-transcript.json` (everything below uses master time)
+4. **Realign** — `npm run realign -- data/<name>.transcript.json` → `data/<name>.cut-transcript.json` (everything below uses master time; applies `data/<name>.corrections.json` spelling fixes so captions are right)
 5. **Color** — `npm run color -- --look <look> --size 1080` (also fixes iPhone HDR and makes every later stage ~4x faster)
 6. **Punch-ins** — subagent `focus-director` → `data/punches.json`; then `npm run punch`
 7. **B-roll** — subagent `broll-curator` → `data/broll.json`; then `npm run broll`. If `assets/broll/` is empty, skip and tell the user what to add (the agent's wishlist).

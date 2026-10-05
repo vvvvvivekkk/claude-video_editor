@@ -102,6 +102,34 @@ const out = {
 };
 
 const base = path.basename(transcriptPath).replace(/\.transcript\.json$/, '');
+
+// Spelling corrections (written by the editor agent from the brief, glossary
+// and script): data/<name>.corrections.json  { "cloud code": "Claude Code", "groc": "Groq" }
+// Matched case-insensitively on whole words, phrases allowed. Timings kept.
+const corrPath = path.join('data', `${base}.corrections.json`);
+if (fs.existsSync(corrPath)) {
+  const corr = JSON.parse(fs.readFileSync(corrPath, 'utf8'));
+  const norm = (w) => w.toLowerCase().replace(/[^\p{L}\p{N}']/gu, '');
+  let fixed = 0;
+  for (const [from, to] of Object.entries(corr)) {
+    const f = from.split(/\s+/).map(norm).filter(Boolean);
+    const t = to.split(/\s+/);
+    if (!f.length) continue;
+    for (let i = 0; i + f.length <= outWords.length; i++) {
+      if (!f.every((fw, k) => norm(outWords[i + k].word) === fw)) continue;
+      const trail = (outWords[i + f.length - 1].word.match(/[.,!?;:]+$/) || [''])[0];
+      if (t.length === f.length) {
+        t.forEach((tw, k) => { outWords[i + k].word = tw + (k === t.length - 1 ? trail : ''); });
+      } else {
+        outWords[i].word = to + trail;
+        outWords[i].end = outWords[i + f.length - 1].end;
+        outWords.splice(i + 1, f.length - 1);
+      }
+      fixed++;
+    }
+  }
+  console.log(`Applied ${fixed} spelling corrections from ${corrPath}`);
+}
 const outPath = path.join('data', `${base}.cut-transcript.json`);
 fs.writeFileSync(outPath, JSON.stringify(out, null, 2));
 console.log(`Realigned ${outWords.length} words (dropped ${dropped} in cuts).`);

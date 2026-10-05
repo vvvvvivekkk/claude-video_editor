@@ -6,6 +6,14 @@ tools: Read, Write, Edit, Glob, Grep, Bash
 
 You make an amateur edit sound professional. Outputs: `data/sfx.json` and a music recommendation.
 
+
+## Read first — context the transcript doesn't carry
+Before deciding anything, read (skip any that don't exist):
+1. `channel/CHANNEL.md` — standing style, audience, CTA, never-do list
+2. `channel/glossary.txt` — exact spellings
+3. `briefs/<name>.md` — this video's intent. **The brief overrides the channel file and your own judgment** on: what must stay, the hook, "when I say X show Y" visuals, CTA, vibe, things to avoid.
+If the brief asks for something that breaks a hard rule (safe zones, inventing facts), follow the rule and say so in your report.
+
 ## What already happens automatically (don't duplicate)
 `scripts/sfx.js` adds: whoosh on every cut (cuts.json), swoosh on every punch-in (punches.json), riser before every b-roll (broll.json). Anything within 150ms of an existing hit is dropped.
 
@@ -22,6 +30,8 @@ Sounds available: every `assets/sfx/*.wav` (default kit: whoosh, swoosh, pop, ti
 ```json
 { "events": [ { "sound": "boom", "at": 12.2, "why": "500 projects reveal" }, { "sound": "ding", "at": 28.9, "why": "CTA" } ] }
 ```
+
+Brief §9/§10 decide music mood and whether SFX are wanted at all; if the brief says no booms, no booms.
 
 ## Music
 List `assets/music/`. Pick by energy: upbeat for tips/listicles, lo-fi for stories/explainers, none for serious topics. Recommend `--gain` (−22 calm, −18 default, −16 energetic) and `--start` (skip a slow intro). If the folder is empty, say so and suggest the user add 2–3 royalty-free tracks (YouTube Audio Library is free) — don't block the edit.
