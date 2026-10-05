@@ -16,6 +16,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { spawnSync } from 'node:child_process';
+import { getMaster, setMaster } from './lib/master.js';
 
 const args = process.argv.slice(2);
 const name = args[0];
@@ -29,7 +30,7 @@ function getFlag(flag, fallback) {
   return i >= 0 && args[i + 1] ? args[i + 1] : fallback;
 }
 
-const master = getFlag('--master', path.join('output', 'edited-master.mp4'));
+const master = getFlag('--master', null) ?? getMaster('compose');
 const out = getFlag('--out', path.join('output', 'with-graphics.mp4'));
 const overlay = path.join('motion', 'projects', name, 'renders', 'overlay.mov');
 
@@ -72,6 +73,7 @@ if (r.status !== 0) {
   process.exit(1);
 }
 
+setMaster(out, 'compose');
 console.log(`\nDone: ${out}`);
 console.log(`\nNext: npm run caption -- data/<name>.transcript.json`);
 console.log('(The caption step burns onto whatever is at output/with-graphics.mp4 if present, else output/edited-master.mp4.)');

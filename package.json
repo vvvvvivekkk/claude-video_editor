@@ -1,7 +1,7 @@
 {
   "name": "claude-video-editor",
-  "version": "0.3.0",
-  "description": "Claude-driven video editing pipeline: reference, watch, transcribe -> cuts.json -> render -> motion graphics -> captions",
+  "version": "0.4.0",
+  "description": "Claude-driven video editor: transcribe -> cuts -> color -> punch-ins -> b-roll -> motion -> transitions -> SFX -> music -> kinetic captions -> export",
   "type": "module",
   "scripts": {
     "reference": "node scripts/reference.js",
@@ -10,11 +10,19 @@
     "cut": "node scripts/cut.js",
     "realign": "node scripts/realign.js",
     "beats": "node scripts/beats.js",
+    "color": "node scripts/color.js",
+    "punch": "node scripts/punch.js",
+    "broll": "node scripts/broll.js",
     "motion:setup": "node scripts/motion-setup.js",
     "motion": "node scripts/motion.js",
     "compose": "node scripts/compose.js",
+    "transitions": "node scripts/transitions.js",
+    "sfx:gen": "node scripts/sfx-gen.js",
+    "sfx": "node scripts/sfx.js",
+    "music": "node scripts/music.js",
     "caption": "node scripts/caption.js",
-    "render": "node scripts/render.js"
+    "export": "node scripts/export.js",
+    "review": "node scripts/review.js"
   },
   "dependencies": {
     "dotenv": "^16.4.5",

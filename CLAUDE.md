@@ -2,37 +2,36 @@
 
 This repo is a video editor. You (Claude) are the editor. The user records a raw talking-head video; you decide what to cut, what to animate, and how it looks.
 
-## The pipeline
+## The pipeline (v0.4 — the editor team)
 
-```
-(optional, before you shoot)
-   -> npm run reference -- <url>           (downloads + transcribes an example)
-   -> reference/<name>/{video.mp4, transcript.json, info.json}
+Claude **decides**, scripts **render**. Every creative call is a plan file a subagent writes; every render script is deterministic and reads the newest video from `data/master.json`.
 
-input/raw.mp4
-   -> npm run transcribe -- input/raw.mp4
-   -> data/raw.transcript.json             (word-level, from Groq Whisper)
+| # | Stage | Decided by (writes) | Rendered by | Command |
+|---|-------|--------------------|-------------|---------|
+| 1 | Transcribe | — | `transcribe.js` → `data/<n>.transcript.json` | — |
+| 2 | Story + cuts + transitions plan | `editor` → `story.json`, `cuts.json` (+`lcut`), `transitions.json` | — | `/cuts` |
+| 3 | Cut (jump cuts, L-cuts) | — | `cut.js` → `edited-master.mp4` (resets chain) | — |
+| 4 | Realign to master time | — | `realign.js` → `data/<n>.cut-transcript.json` | `/realign` |
+| 5 | Color + HDR fix + 1080p | look choice | `color.js` | `/color` |
+| 6 | Punch-in zooms | `focus-director` → `punches.json` | `punch.js` | `/punch` |
+| 7 | B-roll / memes / screens | `broll-curator` → `broll.json` (from `assets/broll/`) | `broll.js` | `/broll` |
+| 8 | Motion graphics (optional) | `motion-director` → HyperFrames overlay | `compose.js` | `/motion` |
+| 9 | Transitions (max 2) | `editor` → `transitions.json` | `transitions.js` | `/transitions` |
+| 10 | SFX | auto (cuts/punches/b-roll) + `sound-designer` → `sfx.json` | `sfx.js` (kit: `npm run sfx:gen`) | `/sfx` |
+| 11 | Music + ducking | `sound-designer` picks from `assets/music/` | `music.js` | `/music`, `/beats` |
+| 12 | Kinetic captions | style choice | `caption.js` | `/caption` |
+| 13 | Export | platform | `export.js` → `output/export/` | `/export` |
+| 14 | Review | `reviewer` (independent) reads sampled frames | `review.js` | `/review` |
 
-   -> npm run watch -- input/raw.mp4       (OPTIONAL — samples frames so you can see)
-   -> data/raw-frames/*.jpg + data/raw.watch.json
+`/edit input/<file>.mp4` runs all of it. Audio cleanup (denoise/loudnorm) is intentionally not built yet.
 
-   -> YOU WRITE: data/cuts.json            (list of good clips)
-   -> npm run cut -- input/raw.mp4
-   -> output/edited-master.mp4
+**Master chain.** `cut` resets `data/master.json`; each later stage reads `getMaster('<stage>')` and advances it. Re-running a stage rewinds to the video just before it (no double zooms / double captions) and drops later stages, which then need re-running. Canonical order: cut → color → punch → broll → compose → transitions → sfx → music → caption.
 
-   -> npm run motion -- raw                (scaffolds motion/projects/raw/)
-   -> YOU AUTHOR HyperFrames HTML          (from inside the project folder)
-   -> motion/projects/raw/renders/overlay.mov  (transparent, ProRes 4444)
-   -> npm run compose -- raw
-   -> output/with-graphics.mp4
+**Time bases.** `cuts.json` and `story.json` use SOURCE time (the raw recording). Everything after the cut — punches, broll, transitions, sfx, captions — uses MASTER time (`data/<n>.cut-transcript.json`). Master time of a join = sum of the clip durations before it.
 
-   -> npm run caption -- data/raw.transcript.json
-   -> output/final.mp4                     (motion + burned-in captions)
-```
+**Assets.** `assets/broll/` (filenames are descriptions, optional `library.json`), `assets/music/`, `assets/sfx/` (generated kit, swap freely). Contents are git-ignored.
 
-Stages 2 (cuts) and 4 (motion) are **yours** — editorial judgment. Stages 1, 3, 5, 6 (transcribe, cut, compose, caption) are deterministic — the user runs them. The reference and watch stages are optional context — reach for them when they help.
-
-The motion stage is **optional**. If the user doesn't want graphics, skip it; `caption.js` auto-detects whether `with-graphics.mp4` exists and burns onto whichever is newer.
+Optional context stages, unchanged: `npm run reference -- <url>` (example reel to imitate), `npm run watch -- input/<file>` (frames of the raw footage).
 
 ---
 

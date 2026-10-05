@@ -28,3 +28,11 @@ motion/sfx/*
 reference/*
 !reference/.gitkeep
 !reference/README.md
+
+# editing assets — your own library, not committed
+assets/broll/*
+!assets/broll/README.md
+assets/music/*
+!assets/music/README.md
+assets/sfx/*
+!assets/sfx/README.md

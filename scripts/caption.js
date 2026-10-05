@@ -17,6 +17,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { spawnSync } from 'node:child_process';
+import { getMaster, setMaster } from './lib/master.js';
 
 const args = process.argv.slice(2);
 const transcriptPath = args[0];
@@ -44,7 +45,9 @@ if (!words.length) {
 // --- Vertical by default (1080x1920). Change here for 16:9. ---
 const PLAY_X = 1080;
 const PLAY_Y = 1920;
-const MARGIN_V = 300;
+// Baseline ~29% up from the bottom: above the IG/TikTok/Shorts UI strip, still in
+// the lower third that the motion stage keeps clear for captions.
+const MARGIN_V = 560;
 
 // --- Shared ASS header. ---
 function assHeader(styles) {
@@ -52,7 +55,7 @@ function assHeader(styles) {
 ScriptType: v4.00+
 PlayResX: ${PLAY_X}
 PlayResY: ${PLAY_Y}
-WrapStyle: 2
+WrapStyle: 0
 ScaledBorderAndShadow: yes
 
 [V4+ Styles]
@@ -77,7 +80,7 @@ let styles = [];
 if (style === 'plain') {
   // v1: 3-word chunks, static.
   styles = [
-    `Style: Cap,Impact,90,&H00FFFFFF,&H00FFFFFF,&H00000000,&H80000000,-1,0,0,0,100,100,0,0,1,6,2,2,60,60,${MARGIN_V},1`,
+    `Style: Cap,Impact,90,&H00FFFFFF,&H00FFFFFF,&H00000000,&H80000000,-1,0,0,0,100,100,0,0,1,6,2,2,90,90,${MARGIN_V},1`,
   ];
   const CHUNK_SIZE = 3;
   const PAUSE_BREAK = 0.35;
@@ -96,7 +99,7 @@ if (style === 'plain') {
 } else if (style === 'pop') {
   // One word at a time, scale-up on entry. White with thick black outline.
   styles = [
-    `Style: Pop,Impact,120,&H00FFFFFF,&H00FFFFFF,&H00000000,&H80000000,-1,0,0,0,100,100,0,0,1,8,3,2,60,60,${MARGIN_V},1`,
+    `Style: Pop,Impact,112,&H00FFFFFF,&H00FFFFFF,&H00000000,&H80000000,-1,0,0,0,100,100,0,0,1,8,3,2,90,90,${MARGIN_V},1`,
   ];
   for (let i = 0; i < words.length; i++) {
     const w = words[i];
@@ -119,7 +122,7 @@ if (style === 'plain') {
   const PAUSE_BREAK = 0.35;
   const HIGHLIGHT_HEX = '&H0000F0FF&'; // ASS color = &HBBGGRR& — this is yellow (R=255,G=240,B=0 approx)
   styles = [
-    `Style: Hl,Impact,100,&H00FFFFFF,&H00FFFFFF,&H00000000,&H80000000,-1,0,0,0,100,100,0,0,1,7,2,2,60,60,${MARGIN_V},1`,
+    `Style: Hl,Impact,84,&H00FFFFFF,&H00FFFFFF,&H00000000,&H80000000,-1,0,0,0,100,100,0,0,1,7,2,2,90,90,${MARGIN_V},1`,
   ];
   // Group into chunks first.
   const chunks = [];
@@ -158,15 +161,10 @@ const assPath = path.join('data', 'captions.ass');
 fs.writeFileSync(assPath, ass);
 console.log(`Style: ${style} — wrote ${events.length} caption events -> ${assPath}`);
 
-// Pick the base video: motion graphics compositing wins if present.
-const withGraphics = path.join('output', 'with-graphics.mp4');
-const bareMaster = path.join('output', 'edited-master.mp4');
-const master = fs.existsSync(withGraphics) ? withGraphics : bareMaster;
+// Base video = newest master in the chain (cut -> color -> punch -> broll ->
+// motion -> transitions -> sfx -> music). See scripts/lib/master.js.
+const master = getMaster('caption');
 const finalOut = path.join('output', 'final.mp4');
-if (!fs.existsSync(master)) {
-  console.error(`Missing ${bareMaster}. Run: node scripts/cut.js <input> first.`);
-  process.exit(1);
-}
 console.log(`Base video: ${master}`);
 
 console.log(`Burning captions -> ${finalOut}`);
@@ -185,4 +183,5 @@ if (r.status !== 0) {
   console.error('Caption burn failed');
   process.exit(1);
 }
+setMaster(finalOut, `caption:${style}`);
 console.log(`\nDone: ${finalOut}`);

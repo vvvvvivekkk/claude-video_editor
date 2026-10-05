@@ -13,7 +13,7 @@ Burn captions onto the latest master.
    - `highlight` — 3-word chunks with the current word highlighted in bright color
    - `plain` — v1 behavior, 3-word static chunks
 
-3. **Run the burn.** `npm run caption -- data/<name>.transcript.json --style <style>`. The script auto-detects whether `output/with-graphics.mp4` exists (motion ran) or only `output/edited-master.mp4` (no motion), and burns onto the newer one.
+3. **Run the burn.** `npm run caption -- data/<name>.cut-transcript.json --style <style>` (prefer the realigned cut-transcript; create it with `npm run realign -- data/<name>.transcript.json`). The script auto-detects whether `output/with-graphics.mp4` exists (motion ran) or only `output/edited-master.mp4` (no motion), and burns onto the newer one.
 
 4. **Report.** Tell the user `output/final.mp4` is ready, and roughly how many caption events were drawn.
 

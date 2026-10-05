@@ -1,31 +1,35 @@
 ---
-description: Full pipeline — raw video to finished reel with motion graphics and kinetic captions
-argument-hint: input/<file>.mp4
+description: Full edit — raw video to a posted-ready reel. Runs the whole editor team stage by stage.
+argument-hint: input/<file>.mp4 [reel|short|youtube]
 ---
 
-End-to-end edit of the raw video at `$ARGUMENTS`. Run every stage in order, pausing only where editorial judgment is yours.
+Edit `$ARGUMENTS` end to end. You are the producer: run deterministic scripts yourself, delegate every creative decision to the right subagent (Agent tool, `subagent_type: <name>`). Keep a task list so the user can see progress. Between stages give a one-line status, not a recap.
 
-## Pipeline
+Ask the user ONCE at the start (AskUserQuestion if available, else plain text), then don't stop again unless something fails:
+- Format: Reel/Short (default) or long-form YouTube
+- Motion graphics (pop-ups/counters/cards via HyperFrames)? default: no on the first pass — it's the slowest stage
+- Music: which file in `assets/music/` (or none)
+- Look: natural / punchy (default) / warm / cool / bw
 
-1. **Transcribe.** Run `npm run transcribe -- $ARGUMENTS`. Confirm `data/<name>.transcript.json` exists.
+## Stages (skip any whose output already exists and is newer than its input, unless the user asked to redo it)
 
-2. **Author cuts.** Delegate to the `editor` subagent (via Agent tool, `subagent_type: editor`). Pass it the transcript path and the target format (ask the user: Reel/Short vs long-form YouTube). The agent writes `data/cuts.json` and reports back.
-
-3. **Render the cut master.** Run `npm run cut -- $ARGUMENTS`. Confirm `output/edited-master.mp4` exists.
-
-4. **Ask the user:** "Add motion graphics (pop-ups, counters, badges)? [y/N]". If no, skip to step 7.
-
-5. **Scaffold motion project.** Run `npm run motion -- <project-name> --style <style>`. Ask the user for the project name (default: the input filename stem) and style (default: liquid-glass). Styles available: liquid-glass, kinetic-type, editorial-grain, pop-bold.
-
-6. **Author the overlay.** Delegate to the `motion-director` subagent. It reads `motion/projects/<project-name>/PROMPT.md`, writes the overlay HTML, invokes HyperFrames to render `overlay.mov`, and reports back. Then run `npm run compose -- <project-name>`.
-
-7. **Burn kinetic captions.** Run `npm run caption -- data/<name>.transcript.json`. The caption script auto-detects whether motion ran and burns onto the right master.
-
-8. **Report.** Tell the user the final file is `output/final.mp4` and what each stage produced (durations, counts). Offer to iterate on any stage.
+1. **Transcribe** — `npm run transcribe -- <input>` → `data/<name>.transcript.json`
+2. **Story + cuts** — subagent `editor` → `data/story.json`, `data/cuts.json`, `data/transitions.json`. Relay its report (hook, durations, flags).
+3. **Cut** — `npm run cut -- <input>` (uses `lcut` from cuts.json) → `output/edited-master.mp4`
+4. **Realign** — `npm run realign -- data/<name>.transcript.json` → `data/<name>.cut-transcript.json` (everything below uses master time)
+5. **Color** — `npm run color -- --look <look> --size 1080` (also fixes iPhone HDR and makes every later stage ~4x faster)
+6. **Punch-ins** — subagent `focus-director` → `data/punches.json`; then `npm run punch`
+7. **B-roll** — subagent `broll-curator` → `data/broll.json`; then `npm run broll`. If `assets/broll/` is empty, skip and tell the user what to add (the agent's wishlist).
+8. **Motion graphics** (only if chosen) — `/motion <name>` flow → `npm run compose -- <name>`
+9. **Transitions** — `npm run transitions` (no-op if the editor chose none)
+10. **Sound** — if `assets/sfx/` is empty: `npm run sfx:gen`. Subagent `sound-designer` → `data/sfx.json` + music advice. Then `npm run sfx`
+11. **Music** — if a track was chosen: `npm run music -- --track <file> --gain <dB>` (optionally `/beats` first)
+12. **Captions** — `npm run caption -- data/<name>.cut-transcript.json --style highlight` (or `pop` if the user prefers one-word)
+13. **Export** — `npm run export -- --platform <reels|shorts|youtube> --name <name>`
+14. **Review** — `npm run review -- output/export/<name>.mp4`, then subagent `reviewer`. Show its notes. If its verdict is "one more pass", offer to apply the top 3 fixes (re-run only the affected stages — every stage re-runs cleanly from its own input).
 
 ## Rules
-
-- Do not run `npm run cut` or `npm run compose` before their inputs exist. Check.
-- Do not re-run a stage that already succeeded unless the user asks.
-- At each pause, give the user a one-line summary of what just happened before asking for input.
-- If any ffmpeg or node call fails, stop and show the error — do not retry blindly.
+- Every render script reads the newest master from `data/master.json` and advances it. Re-running a stage rewinds to just before it automatically — you never need to manage filenames.
+- Order matters for video stages: cut → color → punch → broll → compose → transitions → sfx → music → caption. Audio stages can be redone any time after.
+- If a script fails, stop and show the last lines of the error. Don't retry blindly; don't edit render scripts mid-edit.
+- Final message: path of the export, length, and the reviewer's verdict. Nothing else.
