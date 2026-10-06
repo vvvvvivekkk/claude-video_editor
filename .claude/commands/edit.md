@@ -31,7 +31,9 @@ Ask the user ONCE at the start (AskUserQuestion if available, else plain text), 
 14. **Review** — `npm run review -- output/export/<name>.mp4`, then subagent `reviewer`. Show its notes. If its verdict is "one more pass", offer to apply the top 3 fixes (re-run only the affected stages — every stage re-runs cleanly from its own input).
 
 ## Rules
+- **Re-running any stage drops every stage after it from the chain** (that's how effects never stack). So after ANY re-run — including reviewer fixes — re-run all later stages in canonical order: compose → transitions → sfx → music → caption → export. Never export without sfx and caption in the chain.
+- Before the final message, run `npm run status` and check it says READY. If it lists missing stages, run them, then export again.
 - Every render script reads the newest master from `data/master.json` and advances it. Re-running a stage rewinds to just before it automatically — you never need to manage filenames.
 - Order matters for video stages: cut → color → punch → broll → compose → transitions → sfx → music → caption. Audio stages can be redone any time after.
 - If a script fails, stop and show the last lines of the error. Don't retry blindly; don't edit render scripts mid-edit.
-- Final message: path of the export, length, and the reviewer's verdict. Nothing else.
+- Final message: path of the export, length, the `npm run status` stage line, and the reviewer's verdict. Nothing else.

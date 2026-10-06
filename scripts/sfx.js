@@ -21,7 +21,9 @@ import path from 'node:path';
 import { getMaster, setMaster, args, run, cutBoundaries, probe } from './lib/master.js';
 
 const a = args();
-const DEFAULT_DB = { whoosh: -14, swoosh: -16, pop: -15, tick: -17, ding: -14, boom: -12, riser: -16 };
+// Levels in dB applied to the kit files. Phone voice usually peaks near -3 dBFS,
+// so these land roughly 10–14 dB under it: clearly audible, never on top.
+const DEFAULT_DB = { whoosh: -9, swoosh: -10, pop: -8, tick: -10, ding: -9, boom: -8, riser: -11 };
 const offset = parseFloat(a.flag('--gain-offset', '0')) || 0;
 const input = getMaster('sfx');
 const { duration } = probe(input);

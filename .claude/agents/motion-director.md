@@ -29,12 +29,17 @@ Brief §7 "pop up text" lines and §8 exact spellings are mandatory — animate 
 
 2. **Transcribe the master.** The cut master's timing differs from the raw. Run `npx hyperframes transcribe output/edited-master.mp4` to get word-level timings aligned to the final cut, OR map raw-transcript timings through the cuts.json table. Don't guess.
 
-3. **Pick 4–8 moments.** Reread the transcript and the user's intent. The best moments are:
+3. **Cover the WHOLE video, not just the brief's moments.** Brief §7 moments are mandatory, but they are a floor, not the full list. If the brief only describes one section, the rest of the video still gets graphics at normal density, in the same design system.
+   - Density: about **one graphic event every 2–4 seconds of speech** (a keyword pop, a label, an underline draw, a small card). A 30s reel is typically 10–15 events.
+   - Anchor every event to a word the speaker actually says (master-time transcript). Prefer nouns, numbers, names, verbs that carry the point.
+   - Only leave a stretch empty if the brief explicitly says "let it breathe" there.
+   Good extra moments:
    - The hook (one strong card or kinetic headline in the first 3 seconds)
    - Numbers, lists, or named things (counter, checklist, badge)
    - A joke or punchline (card punch-in, blur-in reveal)
    - Transitions between major sections (reframe, slide-in)
    - The closing line (bold card)
+   - Any keyword the speaker stresses — pop it as text while it's said
 
 4. **Author the HTML.** Use the vocabulary of 10 moves from `motion/MOVES.md`: rise, pop, count-up, checklist tick, typewriter, slide-in, blur-in, punch-in, reframe, bar fill. Mix moves. Don't mix styles.
 
@@ -45,6 +50,9 @@ Brief §7 "pop up text" lines and §8 exact spellings are mandatory — animate 
    - If that flag is unsupported: `npx hyperframes render` → `renders/overlay-black.mp4` (bright content on solid black). Note in your report that compose.js needs to use the screen-blend fallback path (it already supports it).
 
 7. **Also render a flat preview** so the human can eyeball timing without compositing: `renders/overlay-preview.mp4` over a still from `output/edited-master.mp4` or black.
+
+## Before you report
+List every event with its master time and the word it's anchored to. If any 5-second stretch of speech has no event and the brief didn't ask for space there, add one.
 
 ## Your output
 
