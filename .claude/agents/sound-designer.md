@@ -19,7 +19,7 @@ If the brief asks for something that breaks a hard rule (safe zones, inventing f
 
 Automatic hits are ALWAYS on (never tell the producer to use `--no-auto`) unless the brief says no SFX at all. If the brief wants silence in a section, list those auto hits for removal in your report instead.
 
-**Every motion-graphics pop-up gets a hit.** If a motion project ran, read its `index.html` (or the motion-director's event list) and add a `pop`/`tick` at each text/card entrance — that's where most of the audible SFX in a reel come from.
+**Every motion-graphics pop-up and every icon draw-in gets a hit** (`pop` for icons/cards, `tick` for small labels and each node of a list). If a motion project ran, read its `index.html` (or the motion-director's event list) and add a `pop`/`tick` at each text/card entrance — that's where most of the audible SFX in a reel come from.
 
 ## Your extra hits (data/sfx.json)
 Sounds available: every `assets/sfx/*.wav` (default kit: whoosh, swoosh, pop, tick, ding, boom, riser — run `npm run sfx:gen` if empty).

@@ -71,6 +71,7 @@ function copyDir(src, dst) {
 }
 copyDir(path.join('motion', 'fonts'), path.join(projectDir, 'fonts'));
 copyDir(path.join('motion', 'sfx'), path.join(projectDir, 'sfx'));
+copyDir(path.join('motion', 'icons'), path.join(projectDir, 'icons'));
 
 // Assemble PROMPT.md = BASE_PROMPT.md with the <<<STYLE>>> block substituted
 // and the master path pointed at the real file.
@@ -85,7 +86,10 @@ const prompt = base
   .replace(/\.\.\/\.\.\/output\/edited-master\.mp4/g, relMaster)
   .replace(/<<<PASTE ONE STYLE BLOCK HERE[^>]*>>>/, styleBlock);
 
-fs.writeFileSync(path.join(projectDir, 'PROMPT.md'), prompt);
+const iconsDoc = fs.existsSync(path.join('motion', 'icons', 'README.md'))
+  ? '\n\n---\n\n' + fs.readFileSync(path.join('motion', 'icons', 'README.md'), 'utf8')
+  : '';
+fs.writeFileSync(path.join(projectDir, 'PROMPT.md'), prompt + iconsDoc);
 
 // A tiny README inside the project.
 fs.writeFileSync(
@@ -97,6 +101,7 @@ console.log(`\nScaffolded: ${projectDir}`);
 console.log(`  PROMPT.md   base + ${style} style block, master path resolved`);
 console.log(`  fonts/      copied from motion/fonts/`);
 console.log(`  sfx/        copied from motion/sfx/`);
+console.log(`  icons/      animated line-icon library (icons/icons.js) — concepts get icons, not word boxes`);
 console.log(`  renders/    (empty; HyperFrames will write renders/overlay.mov here)`);
 console.log('\nNext:');
 console.log(`  1. cd ${projectDir}`);

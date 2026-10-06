@@ -41,7 +41,10 @@ Brief §7 "pop up text" lines and §8 exact spellings are mandatory — animate 
    - The closing line (bold card)
    - Any keyword the speaker stresses — pop it as text while it's said
 
-4. **Author the HTML.** Use the vocabulary of 10 moves from `motion/MOVES.md`: rise, pop, count-up, checklist tick, typewriter, slide-in, blur-in, punch-in, reframe, bar fill. Mix moves. Don't mix styles.
+4. **Author the HTML.** Use the moves from `motion/MOVES.md`: rise, pop, count-up, checklist tick, typewriter, slide-in, blur-in, punch-in, reframe, bar fill, **icon draw**. Mix moves. Don't mix styles.
+   - **Icon-first rule:** when the anchored word is a concept (`Icons.forWord(word)` returns an icon — connections, clients, opportunities, money, AI, growth, portfolio…), show the **animated icon** (optionally with a small label), NOT a text box. Text-only pop-ups are for numbers, quotes and short phrases. Aim for at least half of all events to be icons or count-ups rather than plain words.
+   - Load the library: `<script src="icons/icons.js"></script>` after GSAP. If `icons/` is missing from the project folder (older scaffold), copy `motion/icons/` into it first. Full API: `motion/icons/README.md`.
+   - Icons are in the user's accent color; respect the style's palette.
 
 5. **Respect safe zones strictly** (from CLAUDE.md): no graphics in the first 3 seconds, over the speaker's face, in the bottom third (captions go there), or in the left/right 10%.
 

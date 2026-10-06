@@ -1,4 +1,4 @@
-# The 10 moves
+# The 11 moves
 
 Reference for the named motion moves Claude knows. When you ask for one by
 name ("add a count-up at 12s", "use the reframe move here"), HyperFrames
@@ -19,6 +19,7 @@ distilled for use in this repo's overlay stage.
 | punch-in       | The whole frame zooms in fast.                                    | On the line people should remember. Pair with the hook.       |
 | reframe        | Your video shrinks into a card and something new appears.         | Transitioning from face-to-camera to a stat or screenshot.    |
 | bar fill       | A progress bar fills up.                                          | "Uploading… 94%" moments, before/after, ratios.               |
+| icon draw      | A line icon draws itself stroke by stroke, then its dots pop.     | Any concept word — connections, clients, money, AI. See `motion/icons/README.md`. Prefer this over a word box. |
 
 ## Composition rules
 
